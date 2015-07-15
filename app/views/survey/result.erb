@@ -1,0 +1,138 @@
+<div class="ui four column grid">
+  <div class="column">
+    <div class="ui fluid card">
+      <div class="content">
+        <div class="header">回答者数</div>
+        <div class="description"></div>
+        <div class="ui tiny statistic">
+          <div class="value">
+            <i class="users icon"></i>
+            <%= @survey.answers.group(:uuid).count(:uuid).keys.size %>
+            人
+          </div>
+          <div class="label"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column">
+    <div class="ui fluid card">
+      <div class="content">
+        <div class="header">質問数</div>
+        <div class="description"></div>
+        <div class="ui tiny statistic">
+          <div class="value">
+            <i class="help icon"></i>
+            <%= @survey.questions.size %>
+            問
+          </div>
+          <div class="label"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<h4 class="ui horizontal divider header">
+  <i class="file text outline icon"></i>
+  アンケート情報
+</h4>
+<h1 class="ui header"><%= @survey.name %></h1>
+<h4 class="ui horizontal divider header">
+  <i class="comment icon"></i>
+  質問、回答結果
+</h4>
+<% @survey.questions.each.with_index(1) do |q, i| %>
+<div class="ui divider"></div>
+<div class="ui grid">
+  <div class="ui six wide column">
+    <div class="ui fluid blue card">
+      <div class="content">
+        <div class="header">
+          <span class="q-num">Q<%= i %>.</span>
+          <%= q.text %>
+        </div>
+      </div>
+      <% if q.type == 1 || q.type == 2 %>
+      <div class="content">
+        <div class="ui list">
+          <% q.choices.each do |v| %>
+          <div class="item"><%= v[:value] %>
+            <%= v[:text] %></div>
+          <% end %>
+        </div>
+      </div>
+      <% end %>
+      <div class="extra content">
+        <span>
+          <i class="checkmark icon"></i>
+          <%= q.type_name %>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="ui ten wide column">
+    <div class="ui fluid card">
+      <div class="content">
+        <% if q.type == 1 || q.type == 2 %>
+        <div id="container<%= i %>"></div>
+        <script>
+          $(function () {
+            $('#container<%= i %>').highcharts({
+              chart: {
+                type: 'column'
+              },
+              title: {
+                text: '<%= q.text %>'
+              },
+              subtitle: {
+                text: ''
+              },
+              xAxis: {
+                categories: [
+                  <% q.choices.each do |c| %> '<%= c[:text] %>', <% end %> ''
+                ],
+                crosshair: true
+              },
+              yAxis: {
+                min: 0,
+                title: {
+                  text: '回答数'
+                }
+              },
+              tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' + '<td style="padding:0"><b>{point.y:.1f} 件</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+              },
+              plotOptions: {
+                column: {
+                  pointPadding: 0.2,
+                  borderWidth: 0
+                }
+              },
+              series: [
+                {
+                  name: '回答数',
+                  data: <%= q.sel_sum(i).to_json.html_safe %>
+
+                }
+              ]
+            });
+          });
+        </script>
+        <% elsif q.type == 9 %>
+        <div class="ui relaxed divided list">
+          <% q.answers(i).select {|a| a.present? }.each do |a| %>
+          <div class="item">
+            <div class="content"><%= a.text %></div>
+          </div>
+          <% end %>
+        </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>

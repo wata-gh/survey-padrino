@@ -1,0 +1,21 @@
+{
+  "name": "survey",
+  "version": "0.0.0",
+  "authors": [
+    "s_watanabe <s_watanabe@active.co.jp>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "semantic-ui": "~2.0.3",
+    "handlebars": "~3.0.3",
+    "highcharts": "~4.1.7"
+  }
+}

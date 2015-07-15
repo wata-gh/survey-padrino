@@ -1,0 +1,61 @@
+<h1 class="ui header"><%= @survey.name %></h1>
+<% form_tag url(:survey, :index, :id => @survey.id, :q => params[:q]), :class => 'ui form' do %>
+<div class="ui ordered steps fluid">
+  <% @survey.questions.each.with_index(1) do |q, i| %>
+  <div class="<%= i < params[:q].to_i ? 'completed' : i == params[:q].to_i ? 'active' : '' %> step" data-url="<%= url(:survey, :index, :id => @survey.id, :q => i) %>">
+    <div class="content">
+      <div class="title">Q<%= i %></div>
+    </div>
+  </div>
+  <% end %>
+</div>
+<div class="ui fluid card">
+  <div class="content">
+    <div class="header">
+      <span class="q-num">Q<%= params[:q] %>.</span>
+      <%= @question.text %></div>
+  </div>
+  <div class="content">
+    <h4 class="ui sub header">
+      <%= @question.type_comment %>
+    </h4>
+    <div class="ui small feed">
+      <% if @question.type == 1 %>
+      <% JSON.parse(@question.value, {:symbolize_names => true}).each.with_index(1) do |v, i| %>
+      <div class="sel">
+        <input<% if @answer.text == v[:value] %> checked<% end %> name="text" type="radio" value="<%= v[:value] %>" id="q<%= i %>">
+        <label for="q<%= i %>"><%= v[:text] %></label>
+      </div>
+      <% end %>
+      <% elsif @question.type == 2 %>
+      <% JSON.parse(@question.value, {:symbolize_names => true}).each.with_index(1) do |v, i| %>
+      <div class="field">
+      <div class="ui checkbox">
+        <input<% if @answer.text.try(:'include?', v[:value]) %> checked<% end %> name="text[]" type="checkbox" value="<%= v[:value] %>" id="q<%= i %>">
+        <label for="q<%= i %>"><%= v[:text] %></label>
+      </div>
+      </div>
+      <% end %>
+      <% elsif @question.type == 9 %>
+      <div class="field">
+        <textarea name="text"><%= @answer.text %></textarea>
+      </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="extra content">
+    <% if params[:q].to_i != 1 %>
+      <% link_to url(:survey, :index, :id => @survey.id, :q => params[:q].to_i - 1), :class => 'ui small button' do %>
+        <i class="undo icon"></i> 戻る
+      <% end %>
+    <% end %>
+    <% if params[:q].to_i < @survey.questions.size %>
+    <button class="ui blue large button right floated" type="submit">
+      <i class="checkmark icon"></i> 次へ</button>
+    <% else %>
+    <button class="ui positive large button right floated" type="submit">
+      <i class="checkmark icon"></i> 完了</button>
+    <% end %>
+  </div>
+</div>
+<% end %>

@@ -1,0 +1,58 @@
+<h1 class="ui header">アンケート内容編集<button class="ui red button right floated del" data-sid="<%= @survey.id %>"><i class="trash outline icon"></i> 削除</button></h1>
+<% form_tag url(:survey, :edit, :id => @survey.id), :class => 'ui form' do %>
+<div class="field">
+  <label>アンケート名</label>
+  <input name="name" placeholder="アンケート名" type="text" value="<%= @survey.name %>">
+</div>
+
+<div id="add-q-pos"></div>
+<div class="field">
+  <div class="ui primary fluid button add-q">
+    <i class="plus icon"></i>
+    質問追加</div>
+</div>
+<button class="ui submit right floated positive button" type="submit"><i class="save icon"></i> 更新</button>
+<% end %>
+<script id="q-tmpl" type="text/x-handlebars-template">
+  <div class="ui clearing segment" id="q-{{id}}">
+    <div class="field">
+      <input name="question[][text]" placeholder="質問" type="text" value="{{text}}">
+    </div>
+    <div class="field">
+      <select name="question[][type]">
+        {{#select type}}
+        <option value="1">選択肢（1つ）</option>
+        <option value="2">選択肢（複数）</option>
+        <option value="9">フリーフォーマット</option>
+        {{/select}}
+      </select>
+    </div>
+    <div class="field">
+      <textarea name="question[][value]">{{value}}</textarea>
+    </div>
+    <div class="field">
+      <div class="ui right floated red basic button del-q" data-id="{{id}}"><i class="trash outline icon"></i> 削除</div>
+    </div>
+  </div>
+</script>
+<div class="ui small basic test modal del">
+  <div class="ui icon header">
+    <i class="trash outline icon"></i>
+    アンケート削除
+  </div>
+  <div class="content">
+    <p>アンケートを削除すると結果も削除され、2度と見ることが出来なくなります。</p>
+  </div>
+  <div class="actions">
+    <div class="ui basic cancel inverted button">
+      <i class="remove icon"></i>
+      キャンセル
+    </div>
+    <div class="ui red ok inverted button">
+      <i class="checkmark icon"></i>
+      削除
+    </div>
+  </div>
+</div>
+<%= javascript_include_tag 'survey' %>
+<script>$(function() {$(<%= @survey.questions.to_json.html_safe %>).each(function(i, v) {Survey.question.add(v);});});</script>

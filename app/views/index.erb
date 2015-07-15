@@ -1,0 +1,65 @@
+<h1 class="ui header">アンケート一覧</h1>
+<%= paginate @surveys %>
+<table class="ui basic table">
+  <thead>
+    <tr>
+      <th class="one wide">no</th>
+      <th class="eleven wide">名前</th>
+      <th class="two wide">編集</th>
+      <th class="two wide">結果</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @surveys.each do |s| %>
+    <tr>
+      <td><%= s.id %></td>
+      <td>
+        <% if s.questions.present? %>
+        <%= link_to s.name, url(:survey, :index, :id => s.id) %>
+        <% else %>
+        <%= s.name %>
+        <% end %>
+      </td>
+      <td class="collapsing">
+        <% link_to url(:survey, :edit, :id => s.id), :class => 'ui basic small button' do %>
+          <i class="pencil icon"></i> 編集
+        <% end %>
+      </td>
+      <td class="collapsing">
+        <% link_to url(:survey, :result, :id => s.id), :class => 'ui basic small button' do %>
+          <i class="bar chart icon"></i> 結果
+        <% end %>
+      </td>
+    </tr>
+    <% end %>
+  </tbody>
+  <tfoot class="full-width">
+    <tr>
+      <th colspan="4">
+        <div class="ui right floated small primary new button">
+          <i class="plus icon"></i>新規追加</div>
+      </th>
+    </tr>
+  </tfoot>
+</table>
+<%= paginate @surveys %>
+<div class="ui modal reg">
+  <i class="close icon"></i>
+  <div class="header">
+    アンケート新規登録
+  </div>
+  <div class="content">
+    <div>
+      <div class="ui fluid input">
+        <input id="name" name="name" placeholder="アンケート名" type="text">
+      </div>
+    </div>
+    <div class="description">
+      アンケート名を入力してください。
+    </div>
+  </div>
+  <div class="actions">
+    <div class="ui negative button">Cancel</div>
+    <div class="ui positive button">OK</div>
+  </div>
+</div>

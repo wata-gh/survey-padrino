@@ -1,0 +1,37 @@
+body {
+  .ui.menu .title.item {
+    padding: 5px;
+    font-size: larger;
+  }
+  .main.container {
+    padding: 60px 2em 7em;
+  }
+  .q-num {
+    font-size: xx-large;
+    color: #0E6EB8;
+    padding-right: 10px;
+  }
+  .sel {
+    padding: 5px;
+    input {
+      cursor: pointer;
+    }
+    label {
+      padding-left: 5px;
+      cursor: pointer;
+    }
+  }
+  .card {
+    .content {
+      .ui.sub.header {
+        font-size: larger;
+      }
+      .sel {
+        font-size: larger;
+      }
+    }
+  }
+  .completed.step {
+    cursor: pointer;
+  }
+}
