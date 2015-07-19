@@ -11,33 +11,38 @@
 <body>
 <div class="ui fixed main menu">
   <div class="container">
-      <div class="title item">
-        <% link_to url('/') do %><b>survey!</b><% end %>
-      </div>
+    <div class="title item">
+      <% link_to url('/') do %><b>survey!</b><% end %>
+    </div>
+  </div>
+  <div class="right menu">
+    <a class="popup icon github item" data-content="View project on GitHub" href="https://github.com/wata-gh/survey">
+      <i class="alternate github icon"></i>
+    </a>
   </div>
 </div>
 <div class="main container">
   <% if flash[:error].present? %>
-      <div class="ui negative icon message">
-          <i class="warning icon"></i>
-          <i class="close icon"></i>
-          <div class="content">
-              <div class="header">
-                  <%= flash[:error] %>
-              </div>
-          </div>
+    <div class="ui negative icon message">
+      <i class="warning icon"></i>
+      <i class="close icon"></i>
+      <div class="content">
+        <div class="header">
+          <%= flash[:error] %>
+        </div>
       </div>
+    </div>
   <% end %>
   <% if flash[:success].present? %>
-      <div class="ui positive icon message">
-          <i class="checkmark icon"></i>
-          <i class="close icon"></i>
-          <div class="content">
-              <div class="header">
-                  <%= flash[:success] %>
-              </div>
-          </div>
+    <div class="ui positive icon message">
+      <i class="checkmark icon"></i>
+      <i class="close icon"></i>
+      <div class="content">
+        <div class="header">
+          <%= flash[:success] %>
+        </div>
       </div>
+    </div>
   <% end %>
   <%= yield %>
 </div>

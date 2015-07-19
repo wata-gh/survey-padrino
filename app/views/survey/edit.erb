@@ -1,10 +1,31 @@
 <h1 class="ui header">アンケート内容編集<button class="ui red button right floated del" data-sid="<%= @survey.id %>"><i class="trash outline icon"></i> 削除</button></h1>
+<% if @survey.errors.present? %>
+<div class="ui negative icon message">
+    <i class="warning icon"></i>
+    <i class="close icon"></i>
+    <div class="content">
+        <div class="header">
+        </div>
+      <%= error_messages_for(@survey) %>
+    </div>
+</div>
+<% end %>
+
 <% form_tag url(:survey, :edit, :id => @survey.id), :class => 'ui form' do %>
-<div class="field">
+<h4 class="ui horizontal divider header">
+  <i class="file text outline icon"></i>
+  アンケート情報
+</h4>
+<% error = @survey.errors.include?(:name) %>
+<div class="field<%= error ? ' error' : '' %>">
   <label>アンケート名</label>
   <input name="name" placeholder="アンケート名" type="text" value="<%= @survey.name %>">
 </div>
 
+<h4 class="ui horizontal divider header">
+  <i class="comment icon"></i>
+  質問
+</h4>
 <div id="add-q-pos"></div>
 <div class="field">
   <div class="ui primary fluid button add-q">
@@ -15,19 +36,23 @@
 <% end %>
 <script id="q-tmpl" type="text/x-handlebars-template">
   <div class="ui clearing segment" id="q-{{id}}">
-    <div class="field">
+    <div class="field {{text_error_class}}">
+      <label>質問</label>
       <input name="question[][text]" placeholder="質問" type="text" value="{{text}}">
     </div>
     <div class="field">
+      <label>回答パターン</label>
       <select name="question[][type]">
         {{#select type}}
-        <option value="1">選択肢（1つ）</option>
-        <option value="2">選択肢（複数）</option>
-        <option value="9">フリーフォーマット</option>
+        <option value="single">選択肢（1つ）</option>
+        <option value="multiple">選択肢（複数）</option>
+        <option value="date">日程調整</option>
+        <option value="free">フリーフォーマット</option>
         {{/select}}
       </select>
     </div>
-    <div class="field">
+    <div class="field {{value_error_class}}">
+      <label>値</label>
       <textarea name="question[][value]">{{value}}</textarea>
     </div>
     <div class="field">
@@ -55,4 +80,4 @@
   </div>
 </div>
 <%= javascript_include_tag 'survey' %>
-<script>$(function() {$(<%= @survey.questions.to_json.html_safe %>).each(function(i, v) {Survey.question.add(v);});});</script>
+<script>$(function() {$(<%= @survey.questions.as_json(:methods => [:error_class, :text_error_class, :value_error_class]).to_json.html_safe %>).each(function(i, v) {Survey.question.add(v);});});</script>

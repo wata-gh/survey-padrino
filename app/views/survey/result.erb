@@ -52,12 +52,12 @@
           <%= q.text %>
         </div>
       </div>
-      <% if q.type == 1 || q.type == 2 %>
+      <% if q.single? || q.multiple? || q.date? %>
       <div class="content">
         <div class="ui list">
           <% q.choices.each do |v| %>
-          <div class="item"><%= v[:value] %>
-            <%= v[:text] %></div>
+          <div class="item"><%= q.date? ? v : v[:value] %>
+            <%= q.date? ? '' : v[:text] %></div>
           <% end %>
         </div>
       </div>
@@ -73,7 +73,7 @@
   <div class="ui ten wide column">
     <div class="ui fluid card">
       <div class="content">
-        <% if q.type == 1 || q.type == 2 %>
+        <% if q.single? || q.multiple? %>
         <div id="container<%= i %>"></div>
         <script>
           $(function () {
@@ -81,6 +81,7 @@
               chart: {
                 type: 'column'
               },
+              colors: ['#21ba45'],
               title: {
                 text: '<%= q.text %>'
               },
@@ -95,6 +96,7 @@
               },
               yAxis: {
                 min: 0,
+                allowDecimals: false,
                 title: {
                   text: '回答数'
                 }
@@ -116,15 +118,93 @@
                 {
                   name: '回答数',
                   data: <%= q.sel_sum(i).to_json.html_safe %>
-
                 }
               ]
             });
           });
         </script>
-        <% elsif q.type == 9 %>
+        <% elsif q.date? %>
+        <div id="container<%= i %>"></div>
+        <script>
+          $(function () {
+            $('#container<%= i %>').highcharts({
+              chart: {
+                  type: 'bar'
+              },
+              colors: ['#b5cc18','#21ba45'],
+              title: {
+                  text: '<%= q.text %>'
+              },
+              xAxis: {
+                categories: <%= q.choices.to_json.html_safe %>,
+              },
+              yAxis: {
+                  min: 0,
+                  allowDecimals: false,
+                  title: {
+                      text: '集計結果'
+                  }
+              },
+              legend: {
+                  reversed: true
+              },
+              plotOptions: {
+                  series: {
+                    stacking: 'normal'
+                  }
+              },
+              series: <%= q.sel_sum(i).to_json.html_safe %>
+            });
+          });
+        </script>
+        <!-- table class="ui compact table">
+          <thead>
+            <tr>
+              <th>日付</th>
+              <th>○</th>
+              <th>△</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% s = q.sel_sum(i) %>
+            <% q.choices.each.with_index do |v, i| %>
+            <tr>
+              <td><%= v %></td>
+              <td><%= s[1][:data][i] %></td>
+              <td><%= s[0][:data][i] %></td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table -->
+        <table class="ui compact table">
+          <thead>
+            <tr>
+              <th>日付</th>
+              <% q.answers(i).each do |a| %>
+              <th><%= JSON.parse(a.text)['name'] %></th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody>
+            <% q.choices.each.with_index do |v, j| %>
+            <tr>
+              <td><%= v %></td>
+              <% q.answers(i).each do |a| %>
+                <td><%= {'2' => '○', '1' => '△', '0' => '☓'}[JSON.parse(a.text)['date'][v]] %></td>
+              <% end %>
+            </tr>
+            <% end %>
+            <tr>
+              <td></td>
+              <% q.answers(i).each do |a| %>
+                <td><%= JSON.parse(a.text)['comment'] %></td>
+              <% end %>
+            </tr>
+          </tbody>
+        </table>
+        <% elsif q.free? %>
         <div class="ui relaxed divided list">
-          <% q.answers(i).select {|a| a.present? }.each do |a| %>
+          <% q.answers(i).select {|a| a.text.present? }.each do |a| %>
           <div class="item">
             <div class="content"><%= a.text %></div>
           </div>

@@ -12,29 +12,31 @@ Survey::App.controllers :survey do
     Surveys.transaction do
       @survey.destroy!
     end
-    redirect '/', :success => '削除に成功しました。'
+    redirect url('/'), :success => '削除に成功しました。'
   end
 
   get :edit, :map => '/survey/:id/edit' do
-    @survey = Surveys.find params[:id]
+    @survey = Surveys.find_by :id => params[:id]
     halt 404 unless @survey
     render :edit
   end
 
   post :edit, :map => '/survey/:id/edit' do
-    s = Surveys.find_by :id => params[:id]
-    halt 404 unless s
-    Surveys.transaction do
-      s.questions.each {|q| q.destroy!}
-      s.name = params[:name]
-      s.save!
-      qs = params[:question]
-      qs.each do |q|
-        q[:surveys_id] = s.id
-        Question.create! q
-      end if qs.present?
+    @survey = Surveys.eager_load(:questions).find_by :id => params[:id]
+    halt 404 unless @survey
+    begin
+      Surveys.transaction do
+        @survey.questions.destroy_all
+        @survey.name = params[:name]
+        (params[:question] || []).each do |q|
+          @survey.questions.build q
+        end
+        @survey.save!
+      end
+      redirect url(:survey, :edit, {:id => @survey.id}), :success => '更新に成功しました。'
+    rescue
+      render :edit
     end
-    redirect url(:survey, :edit, {:id => s.id}), :success => '更新に成功しました。'
   end
 
   get :finish do
@@ -53,6 +55,7 @@ Survey::App.controllers :survey do
     halt 404 unless @survey
     @question = @survey.questions[params[:q].to_i - 1]
     halt 404 unless @question
+    redirect url(:survey, :index, :id => @survey.id) if session[:uuid].blank?
     @answer = Answer.where(:surveys_id => @survey.id, :uuid => session[:uuid], :no => params[:q].to_i).first_or_initialize
     render 'survey/index'
   end
@@ -63,10 +66,22 @@ Survey::App.controllers :survey do
     redirect url(:survey, :index, :id => s.id) if session[:uuid].blank?
     a = Answer.where(:surveys_id => s.id, :uuid => session[:uuid], :no => params[:q].to_i).first_or_initialize
     a.surveys_id = s.id
+    q = s.questions[params[:q].to_i - 1]
     a.no = params[:q].to_i
     a.uuid = session[:uuid]
-    a.text = params[:text]
-    a.text = params[:text].to_json if params[:text].instance_of?(Array)
+    a.text = params[:text] if q.single? || q.free?
+    a.text = params[:text].to_json if q.multiple?
+    if q.date?
+      t = {}
+      q.each_date.each do |d|
+        t[d] = params[d]
+      end
+      a.text = {
+        :name    => params[:name],
+        :comment => params[:comment],
+        :date    => t,
+      }.to_json
+    end
     a.save!
     qn = params[:q].to_i + 1
     redirect url(:survey, :index, :id => s.id, :q => qn) if qn <= s.questions.size

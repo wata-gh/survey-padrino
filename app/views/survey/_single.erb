@@ -1,0 +1,6 @@
+<% JSON.parse(@question.value, {:symbolize_names => true}).each.with_index(1) do |v, i| %>
+<div class="sel">
+  <input<% if @answer.text == v[:value] %> checked<% end %> name="text" type="radio" value="<%= v[:value] %>" id="q<%= i %>">
+  <label for="q<%= i %>"><%= v[:text] %></label>
+</div>
+<% end %>

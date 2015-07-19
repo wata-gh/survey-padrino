@@ -31,6 +31,11 @@ Bundler.require(:default, RACK_ENV)
 #   include Padrino::Helpers::TranslationHelpers
 # end
 
+## Configure your I18n
+I18n.default_locale = :ja
+I18n.load_path = Dir[File.dirname(__FILE__) + '/locales/ja.yml']
+I18n.enforce_available_locales = true
+
 ##
 # Add your before (RE)load hooks here
 #

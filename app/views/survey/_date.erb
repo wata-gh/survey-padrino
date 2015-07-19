@@ -1,0 +1,36 @@
+<% ans = JSON.parse(@answer.text || '{"name": "", "comment": "", "date": {}}') %>
+<% p ans['date'] %>
+<h2 class="ui header">
+  表示名
+</h2>
+<div class="field">
+  <input type="text" name="name" value="<%= ans['name'] %>">
+</div>
+<h2 class="ui header">
+  日にち候補
+</h2>
+<% @question.each_date.each.with_index(1) do |v, i| %>
+<% d = ans['date'] %>
+<% p d %>
+<div class="field">
+    <div class="ui mini horizontal statistic">
+      <div class="value">
+        <%= v %>
+      </div>
+      <div class="label">
+        <div class="three ui buttons" data-value="<%= v %>">
+          <a class="ui huge basic toggle green button<%= d[v] == '2' ? ' active' : '' %>" data-val="2">○</a>
+          <a class="ui huge basic toggle yellow button<%= d[v] == '1' ? ' active' : '' %>" data-val="1">△</a>
+          <a class="ui huge basic toggle grey button<%= d[v] == '0' ? ' active' : '' %>" data-val="0">☓</a>
+          <input type="hidden" name="<%= v %>" value="<%= d[v] %>">
+        </div>
+      </div>
+  </div>
+</div>
+<% end %>
+<h2 class="ui header">
+  コメント
+</h2>
+<div class="field">
+  <input type="text" name="comment" value="<%= ans['comment'] %>">
+</div>
