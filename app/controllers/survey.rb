@@ -1,14 +1,14 @@
 Survey::App.controllers :survey do
 
   get :result, :map => '/survey/:id/result' do
-    @survey = Surveys.find params[:id]
-    halt 404 unless @survey
+    @survey = Surveys.find_by(:id => params[:id]) or halt 404
+    halt 404 if @survey.is_secret && @survey.hash_key != params[:hash_key]
     render :result
   end
 
   get :delete, :map => '/survey/:id/delete' do
-    @survey = Surveys.find params[:id]
-    halt 404 unless @survey
+    @survey = Surveys.find_by(:id => params[:id]) or halt 404
+    halt 404 if @survey.is_secret && @survey.hash_key != params[:hash_key]
     Surveys.transaction do
       @survey.destroy!
     end
@@ -16,24 +16,25 @@ Survey::App.controllers :survey do
   end
 
   get :edit, :map => '/survey/:id/edit' do
-    @survey = Surveys.find_by :id => params[:id]
-    halt 404 unless @survey
+    @survey = Surveys.find_by(:id => params[:id]) or halt 404
+    halt 404 if @survey.is_secret && @survey.hash_key != params[:hash_key]
     render :edit
   end
 
   post :edit, :map => '/survey/:id/edit' do
-    @survey = Surveys.eager_load(:questions).find_by :id => params[:id]
-    halt 404 unless @survey
+    @survey = Surveys.eager_load(:questions).find_by(:id => params[:id]) or halt 404
+    halt 404 if @survey.is_secret && @survey.hash_key != params[:hash_key]
     begin
       Surveys.transaction do
         @survey.questions.destroy_all
         @survey.name = params[:name]
-        (params[:question] || []).each do |q|
-          @survey.questions.build q
-        end
+        @survey.is_secret = params[:is_secret] == 'true' ? true : false
+        @survey.questions.build(params[:question] || [])
         @survey.save!
       end
-      redirect url(:survey, :edit, {:id => @survey.id}), :success => '更新に成功しました。'
+      par = {:id => @survey.id}
+      par[:hash_key] = @survey.hash_key if @survey.is_secret
+      redirect url(:survey, :edit, par), :success => '更新に成功しました。'
     rescue
       render :edit
     end

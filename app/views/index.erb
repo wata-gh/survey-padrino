@@ -1,6 +1,6 @@
 <h1 class="ui header">アンケート一覧</h1>
 <%= paginate @surveys %>
-<table class="ui basic table">
+<table class="ui basic compact table">
   <thead>
     <tr>
       <th class="one wide">no</th>
@@ -11,9 +11,12 @@
   </thead>
   <tbody>
     <% @surveys.each do |s| %>
-    <tr>
+    <tr<% if s.is_secret %> class="secret"<% end %>>
       <td><%= s.id %></td>
       <td>
+        <% if s.is_secret %>
+        <i class="lock icon"></i>
+        <% end %>
         <% if s.questions.present? %>
         <%= link_to s.name, url(:survey, :index, :id => s.id) %>
         <% else %>
@@ -21,12 +24,13 @@
         <% end %>
       </td>
       <td class="collapsing">
-        <% link_to url(:survey, :edit, :id => s.id), :class => 'ui basic small button' do %>
+        <% dis = s.is_secret ? ' disabled' : '' %>
+        <% link_to url(:survey, :edit, :id => s.id), :class => 'ui basic small button' + dis do %>
           <i class="pencil icon"></i> 編集
         <% end %>
       </td>
       <td class="collapsing">
-        <% link_to url(:survey, :result, :id => s.id), :class => 'ui basic small button' do %>
+        <% link_to url(:survey, :result, :id => s.id), :class => 'ui basic small button' + dis do %>
           <i class="bar chart icon"></i> 結果
         <% end %>
       </td>
@@ -49,13 +53,22 @@
     アンケート新規登録
   </div>
   <div class="content">
-    <div>
-      <div class="ui fluid input">
-        <input id="name" name="name" placeholder="アンケート名" type="text">
+    <div class="ui form">
+      <div class="field">
+        <div class="ui fluid input">
+          <input id="name" name="name" placeholder="アンケート名" type="text">
+        </div>
+        <div class="description">
+          アンケート名を入力してください。
+        </div>
       </div>
-    </div>
-    <div class="description">
-      アンケート名を入力してください。
+      <div class="inline field">
+        <div class="ui checkbox">
+          <input id="is_secret" name="is_secret" type="checkbox" value="t">
+          <input id="hash_key" type="hidden" name="hash_key" value="">
+          <label>非公開</label>
+        </div>
+      </div>
     </div>
   </div>
   <div class="actions">

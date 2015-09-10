@@ -7,5 +7,5 @@
     remote:        data-remote
 -%>
 <% unless current_page.first? %>
-<%= link_to '<i class="left arrow icon"></i>'.html_safe, url, :rel => 'prev', class: 'icon item' %>
+<%= link_to '<i class="left arrow icon"></i>'.html_safe, (ENV['RACK_BASE_URI'] ? ENV['RACK_BASE_URI'] : '') + url, :rel => 'prev', class: 'icon item' %>
 <% end %>

@@ -32,7 +32,6 @@ class Question < ActiveRecord::Base
   end
 
   def choices
-    p self.text
     return self.value.split("\n").map(&:chomp) if self.date?
     JSON.parse(self.value, {:symbolize_names => true})
   end
@@ -42,7 +41,10 @@ class Question < ActiveRecord::Base
     if self.single?
       s = self.answers(i).group(:text).count(:text)
       self.choices.each do |c|
-        r << (s[c[:value].to_s].present? ? s[c[:value]] : 0)
+        r << {
+          :name => c[:text],
+          :y    => (s[c[:value].to_s].present? ? s[c[:value]] : 0),
+        }
       end
     elsif self.multiple?
       s = {}
@@ -51,7 +53,10 @@ class Question < ActiveRecord::Base
         begin
           JSON.parse(a.text).each {|v| s[v] += 1}
         rescue
-          s[a.text] += 1
+          if a.text.present?
+            s[a.text] = 0 if s[a.text].blank?
+            s[a.text] += 1
+          end
         end
       end
       self.choices.each do |c|
@@ -90,9 +95,22 @@ class Question < ActiveRecord::Base
   def value_error_class
     self.errors[:value].present? ? 'error' : ''
   end
+  def value_data
+    begin
+      JSON.parse(self.value)
+    rescue
+      if self.date?
+        return {
+          :dates => self.value.split("\n").map(&:chomp)
+        }
+      elsif self.free?
+        return []
+      end
+    end
+  end
 
   def each_date
-    self.value.split("\n").map(&:chop)
+    self.value.split("\n").map(&:chomp)
   end
 
   protected

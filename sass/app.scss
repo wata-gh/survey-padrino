@@ -1,10 +1,17 @@
 body {
   .ui.menu .title.item {
-    padding: 5px;
+    padding: 5px 15px 5px 7px;
     font-size: larger;
   }
   .main.container {
     padding: 60px 2em 7em;
+    table {
+      tbody {
+        tr.secret {
+          background-color: #fff9ea;
+        }
+      }
+    }
   }
   .q-num {
     font-size: xx-large;

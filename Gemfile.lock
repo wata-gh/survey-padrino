@@ -28,6 +28,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     arel (6.0.2)
+    awesome_print (1.6.1)
     builder (3.2.2)
     erubis (2.7.0)
     http_router (0.11.2)
@@ -125,6 +126,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord (>= 3.1)
+  awesome_print
   erubis (~> 2.7.0)
   kaminari
   padrino (= 0.12.2)

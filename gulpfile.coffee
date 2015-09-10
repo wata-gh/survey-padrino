@@ -7,7 +7,7 @@ less        = require 'gulp-less'
 sass        = require 'gulp-sass'
 coffee      = require 'gulp-coffee'
 urlAdjuster = require 'gulp-css-url-adjuster'
- 
+
 gulp.task 'bower', ->
   jsFilter = gulpFilter '**/*.js'
   lessFilter = gulpFilter '**/*.less'
@@ -37,6 +37,6 @@ gulp.task 'coffee', ->
     .pipe gulp.dest('./public/javascripts')
 
 gulp.task 'watch', ->
-  gulp.watch 'bower_components/**/*.*', ['bower']
+  gulp.watch 'bower.json', ['bower']
   gulp.watch 'sass/**/*.scss', ['sass']
   gulp.watch 'coffee/**/*.coffee', ['coffee']

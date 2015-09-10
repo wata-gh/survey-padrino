@@ -1,4 +1,9 @@
-<h1 class="ui header">アンケート内容編集<button class="ui red button right floated del" data-sid="<%= @survey.id %>"><i class="trash outline icon"></i> 削除</button></h1>
+<style>
+.fields label:first-of-type {
+  display: block;
+}
+</style>
+<h1 class="ui header">アンケート内容編集<% if @survey.is_secret %> <a class="ui yellow label">SECRET</a><% end %><button class="ui red button right floated del" data-sid="<%= @survey.id %>"><i class="trash outline icon"></i> 削除</button></h1>
 <% if @survey.errors.present? %>
 <div class="ui negative icon message">
     <i class="warning icon"></i>
@@ -11,7 +16,18 @@
 </div>
 <% end %>
 
-<% form_tag url(:survey, :edit, :id => @survey.id), :class => 'ui form' do %>
+<% if @survey.is_secret %>
+<div class="ui attached warning message">
+  <div class="header">
+    このアクセスURLはメモしておかないとアクセス出来なくなります。
+  </div>
+  <p>
+    <a href="<%= url_for :survey, :edit, :id => @survey.id, :hash_key => @survey.hash_key %>" class="ui basic yellow button"><i class="pencil icon"></i> 編集用URL</a>
+    <a href="<%= url_for :survey, :result, :id => @survey.id, :hash_key => @survey.hash_key %>" class="ui basic yellow button"><i class="bar chart icon"></i> 結果用URL</a>
+  </p>
+</div>
+<% end %>
+<% form_tag url(:survey, :edit, :id => @survey.id), :class => 'ui form fluid attached segment', :id => 'form' do %>
 <h4 class="ui horizontal divider header">
   <i class="file text outline icon"></i>
   アンケート情報
@@ -20,6 +36,13 @@
 <div class="field<%= error ? ' error' : '' %>">
   <label>アンケート名</label>
   <input name="name" placeholder="アンケート名" type="text" value="<%= @survey.name %>">
+</div>
+<div class="field">
+  <label>非公開</label>
+  <div class="ui checkbox">
+    <input name="is_secret" type="checkbox" value="true"<% if @survey.is_secret %> checked="checked"<% end %>>
+    <input id="hash_key" type="hidden" name="hash_key" value="<%= @survey.hash_key %>">
+  </div>
 </div>
 
 <h4 class="ui horizontal divider header">
@@ -34,6 +57,36 @@
 </div>
 <button class="ui submit right floated positive button" type="submit"><i class="save icon"></i> 更新</button>
 <% end %>
+
+<!-- templates -->
+<script id="a-single-tmpl" type="text/x-handlebars-template">
+<div class="fields single" style="display: none;">
+  <div class="one wide field">
+    <div class="ui icon red basic button del-a"><i class="trash outline icon"></i></div>
+  </div>
+  <div class="three wide field">
+    <input type="text" value="{{value}}" placeholder="値">
+  </div>
+  <div class="twelve wide field">
+    <input type="text" value="{{text}}" placeholder="表記">
+  </div>
+</div>
+</script>
+
+<script id="a-multiple-tmpl" type="text/x-handlebars-template">
+<div class="fields multiple" style="display: none;">
+  <div class="one wide field">
+    <div class="ui icon red basic button del-a"><i class="trash outline icon"></i></div>
+  </div>
+  <div class="three wide field">
+    <input type="text" value="{{value}}" placeholder="値">
+  </div>
+  <div class="twelve wide field">
+    <input type="text" value="{{text}}" placeholder="表記">
+  </div>
+</div>
+</script>
+
 <script id="q-tmpl" type="text/x-handlebars-template">
   <div class="ui clearing segment" id="q-{{id}}">
     <div class="field {{text_error_class}}">
@@ -51,9 +104,31 @@
         {{/select}}
       </select>
     </div>
-    <div class="field {{value_error_class}}">
+    {{#each value_data}}
+      {{> a-single}}
+    {{/each}}
+    {{#each value_data}}
+      {{> a-multiple}}
+    {{/each}}
+    <div class="field single multiple" style="display: none;">
+      <input type="hidden" name="question[][value]">
+    </div>
+    <div class="add-a-pos"></div>
+    <div class="field single" style="display: none;">
+      <div class="ui default fluid button add-a">
+        <i class="plus icon"></i>
+        選択肢追加</div>
+    </div>
+    <div class="field multiple" style="display: none;">
+      <div class="ui default fluid button add-a">
+        <i class="plus icon"></i>
+        選択肢追加</div>
+    </div>
+
+    <div class="field {{value_error_class}} date" style="display: none;">
       <label>値</label>
-      <textarea name="question[][value]">{{value}}</textarea>
+      <textarea name="question[][value]">{{#each value_data.dates}}{{this}}
+{{/each}}</textarea>
     </div>
     <div class="field">
       <div class="ui right floated red basic button del-q" data-id="{{id}}"><i class="trash outline icon"></i> 削除</div>
@@ -80,4 +155,5 @@
   </div>
 </div>
 <%= javascript_include_tag 'survey' %>
-<script>$(function() {$(<%= @survey.questions.as_json(:methods => [:error_class, :text_error_class, :value_error_class]).to_json.html_safe %>).each(function(i, v) {Survey.question.add(v);});});</script>
+<script>$(function() {Survey.Edit.init();});</script>
+<script>$(function() {$(<%= @survey.questions.as_json(:methods => [:error_class, :text_error_class, :value_error_class, :value_data]).to_json.html_safe %>).each(function(i, v) {Survey.question.add(v);});});</script>

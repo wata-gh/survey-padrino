@@ -36,7 +36,7 @@
   <i class="file text outline icon"></i>
   アンケート情報
 </h4>
-<h1 class="ui header"><%= @survey.name %></h1>
+<h1 class="ui header"><%= @survey.name %><% if @survey.is_secret %> <a class="ui yellow label">SECRET</a><% end %></h1>
 <h4 class="ui horizontal divider header">
   <i class="comment icon"></i>
   質問、回答結果
@@ -73,7 +73,66 @@
   <div class="ui ten wide column">
     <div class="ui fluid card">
       <div class="content">
-        <% if q.single? || q.multiple? %>
+        <% if q.single? %>
+        <div id="container<%= i %>"></div>
+        <script>
+          $(function () {
+            $('#container<%= i %>').highcharts({
+              chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+              },
+              title: {
+                text: '<%= q.text %>'
+              },
+              subtitle: {
+                text: ''
+              },
+              xAxis: {
+                categories: [
+                  <% q.choices.each do |c| %> '<%= c[:text] %>', <% end %> ''
+                ],
+                crosshair: true
+              },
+              yAxis: {
+                min: 0,
+                allowDecimals: false,
+                title: {
+                  text: '回答数'
+                }
+              },
+              tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' + '<td style="padding:0"><b>{point.y} 件</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+              },
+              plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
+                }
+              },
+              series: [
+                {
+                  name: '回答数',
+                  data: <%= q.sel_sum(i).to_json.html_safe %>
+                }
+              ]
+            });
+          });
+        </script>
+        <% elsif q.multiple? %>
         <div id="container<%= i %>"></div>
         <script>
           $(function () {
