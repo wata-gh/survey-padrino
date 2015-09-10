@@ -1,5 +1,4 @@
-<% ans = JSON.parse(@answer.text || '{"name": "", "comment": "", "date": {}}') %>
-<% p ans['date'] %>
+<% ans = JSON.parse(@answer.text || '{"name": "", "comment": "", "detail": "", "date": {}}') %>
 <h2 class="ui header">
   表示名
 </h2>
@@ -11,7 +10,6 @@
 </h2>
 <% @question.each_date.each.with_index(1) do |v, i| %>
 <% d = ans['date'] %>
-<% p d %>
 <div class="field">
     <div class="ui mini horizontal statistic">
       <div class="value">

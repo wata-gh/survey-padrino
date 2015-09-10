@@ -19,6 +19,7 @@ gem 'activerecord', '>= 3.1', :require => 'active_record'
 gem 'sqlite3'
 gem 'kaminari', :require => 'kaminari/sinatra'
 gem 'unicorn'
+gem 'awesome_print'
 
 # Test requirements
 

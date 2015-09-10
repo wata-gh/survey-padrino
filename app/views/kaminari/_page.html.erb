@@ -7,4 +7,4 @@
     per_page:      number of items to fetch per page
     remote:        data-remote
 -%>
-<%= link_to page, url, class: "item#{ page.current? ? ' active' : '' }" %>
+<%= link_to page, (ENV['RACK_BASE_URI'] ? ENV['RACK_BASE_URI'] : '') + url, class: "item#{ page.current? ? ' active' : '' }" %>

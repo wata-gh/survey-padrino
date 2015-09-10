@@ -44,7 +44,7 @@ module Survey
     #
 
     get '/' do
-      @surveys = Surveys.page(params[:page]).eager_load(:questions).order(:updated_at => :desc)
+      @surveys = Surveys.page(params[:page]).references(:questions).includes(:questions).order(:updated_at => :desc)
       render 'index'
     end
 
@@ -57,21 +57,19 @@ module Survey
     #   end
     #
     configure :production do
-        ENV['RACK_BASE_URI'] = '/s'
+      ENV['RACK_BASE_URI'] = '/s'
     end
-    ##
-    # You can manage errors like:
-    #
-    #   error 404 do
-    #     render 'errors/404'
-    #   end
-    #
-    #   error 505 do
-    #     render 'errors/505'
-    #   end
-    #
+
     error 404 do
       render 'errors/404'
+    end
+
+    error 505 do
+      render 'errors/505'
+    end
+
+    error ActiveRecord::RecordNotFound do
+      halt 404
     end
   end
 end

@@ -13,6 +13,8 @@
 #     :socket    => '/tmp/mysql.sock'
 #   }
 #
+#   :database => Padrino.root('db', 'survey_development.db')
+
 ActiveRecord::Base.configurations[:development] = {
   :adapter => 'sqlite3',
   :database => Padrino.root('db', 'survey_development.db')
