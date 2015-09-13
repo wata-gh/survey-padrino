@@ -4,7 +4,9 @@
   <thead>
     <tr>
       <th class="one wide">no</th>
-      <th class="eleven wide">名前</th>
+      <th class="nine wide">名前</th>
+      <th class="two wide">作成</th>
+      <th class="two wide">更新</th>
       <th class="two wide">編集</th>
       <th class="two wide">結果</th>
     </tr>
@@ -24,6 +26,12 @@
         <% end %>
       </td>
       <td class="collapsing">
+        <%= s.created_at.strftime '%Y-%m-%d %H:%M:%S' %>
+      </td>
+      <td class="collapsing">
+        <%= time_ago_in_words s.updated_at %>前
+      </td>
+      <td class="collapsing">
         <% dis = s.is_secret ? ' disabled' : '' %>
         <% link_to url(:survey, :edit, :id => s.id), :class => 'ui basic small button' + dis do %>
           <i class="pencil icon"></i> 編集
@@ -39,7 +47,7 @@
   </tbody>
   <tfoot class="full-width">
     <tr>
-      <th colspan="4">
+      <th colspan="6">
         <div class="ui right floated small primary new button">
           <i class="plus icon"></i>新規追加</div>
       </th>
