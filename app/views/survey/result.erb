@@ -71,7 +71,7 @@
     </div>
   </div>
   <div class="ui ten wide column">
-    <div class="ui fluid card">
+    <div class="ui fluid card" style="overflow: auto;">
       <div class="content">
         <% if q.single? %>
         <div id="container<%= i %>"></div>
@@ -235,12 +235,12 @@
             <% end %>
           </tbody>
         </table -->
-        <table class="ui compact table">
+        <table class="ui compact celled table">
           <thead>
             <tr>
               <th>日付</th>
               <% q.answers(i).each do |a| %>
-              <th><%= JSON.parse(a.text)['name'] %></th>
+              <th class="collapsing"><%= JSON.parse(a.text)['name'] %></th>
               <% end %>
             </tr>
           </thead>
